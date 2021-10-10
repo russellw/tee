@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <windows.h>
 
@@ -15,6 +16,21 @@ static void help() {
 		"File defaults to:\n"
 		"%s\n",
 		file);
+}
+
+[[noreturn]] void err(const char *prefix) {
+	auto e = GetLastError();
+	LPSTR msg = 0;
+	size_t size = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		0,
+		e,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPSTR)&msg,
+		0,
+		0);
+	fprintf(stderr, "%s: %s", prefix, msg);
+	exit(1);
 }
 
 int main(int argc, char **argv) {
@@ -52,12 +68,15 @@ int main(int argc, char **argv) {
 	auto in = GetStdHandle(STD_INPUT_HANDLE);
 	auto out = GetStdHandle(STD_OUTPUT_HANDLE);
 	auto f = CreateFile(file, GENERIC_WRITE, FILE_SHARE_READ, 0, append ? OPEN_ALWAYS : CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	if (f == INVALID_HANDLE_VALUE) err(file);
+	if (append)
+		if (SetFilePointer(f, 0, 0, FILE_END) == INVALID_SET_FILE_POINTER) err("SetFilePointer");
 	static char buf[1 << 16];
 	for (;;) {
 		DWORD n;
-		auto r = ReadFile(in, buf, sizeof buf, &n, 0);
-		if (!r) break;
-		WriteFile(out, buf, n, 0, 0);
+		if (!ReadFile(in, buf, sizeof buf, &n, 0)) err("ReadFile");
+		if (!n) return 0;
+		if (!WriteFile(out, buf, n, 0, 0)) err("WriteFile");
+		if (!WriteFile(f, buf, n, 0, 0)) err("WriteFile");
 	}
-	return 0;
 }
