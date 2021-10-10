@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'V':
 		case 'v':
-			printf("tee version 0\n");
+			printf("tee version 1\n");
 			return 0;
 		default:
 			fprintf(stderr, "%s: unknown option\n", argv[i]);
