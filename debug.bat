@@ -7,5 +7,3 @@ if errorlevel 1 goto :eof
 rem Then compile with Microsoft C++
 cl /DDEBUG /MTd /WX /Zi /std:c++17 *.cc dbghelp.lib
 if errorlevel 1 goto :eof
-
-tee %*
