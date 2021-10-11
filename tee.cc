@@ -3,6 +3,7 @@
 #include <time.h>
 #include <windows.h>
 
+#define version "1"
 static char file[4096];
 
 static void help() {
@@ -57,7 +58,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'V':
 		case 'v':
-			printf("tee version 1\n");
+			printf("tee version " version "\n");
 			return 0;
 		default:
 			fprintf(stderr, "%s: unknown option\n", argv[i]);
