@@ -75,7 +75,10 @@ int main(int argc, char **argv) {
 	static char buf[1 << 16];
 	for (;;) {
 		DWORD n;
-		if (!ReadFile(in, buf, sizeof buf, &n, 0)) err("ReadFile");
+		if (!ReadFile(in, buf, sizeof buf, &n, 0)) {
+			if (GetLastError() == ERROR_BROKEN_PIPE) return 0;
+			err("ReadFile");
+		}
 		if (!n) return 0;
 		if (!WriteFile(out, buf, n, 0, 0)) err("WriteFile");
 		if (!WriteFile(f, buf, n, 0, 0)) err("WriteFile");
