@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 	if (f == INVALID_HANDLE_VALUE) err(file);
 	if (append)
 		if (SetFilePointer(f, 0, 0, FILE_END) == INVALID_SET_FILE_POINTER) err("SetFilePointer");
-	static char buf[1 << 16];
+	static char buf[8192];
 	for (;;) {
 		DWORD n;
 		if (!ReadFile(in, buf, sizeof buf, &n, 0)) {
